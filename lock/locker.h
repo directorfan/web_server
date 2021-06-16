@@ -3,7 +3,7 @@
 
 #include <exception>
 #include <pthread.h>
-#include <semphore.h>
+#include <semaphore.h>
 
 class sem 
 {
@@ -88,7 +88,7 @@ public:
 	}
 	bool timewait(pthread_mutex_t *m_mutex,struct timespec t)
 	{
-		return pthread_cond_timewait(&m_cond,m_mutex,&t) == 0;
+		return pthread_cond_timedwait(&m_cond,m_mutex,&t) == 0;
 	}
 	bool signal()
 	{
