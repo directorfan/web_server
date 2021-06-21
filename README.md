@@ -254,7 +254,7 @@ MYSQL server
 2)监听连接和读写事件，定时事件  
 3)处理新连接，添加定时器到定时器容器链表，将socketfd对应http_conn对象重新赋值  
 4)将读写socket对应http_conn对象放入工作队列，调整定时器  
-5)创建定时器容器链表timer_lst和链接资源数组users_timer  
+5)创建定时器容器链表timer_lst和连接资源数组users_timer  
 6)监听到管道有读事件，设置timeout=true后，遍历容器链表  
 
     const int MAX_FD = 65536;           //最大文件描述符
