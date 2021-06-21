@@ -325,16 +325,16 @@ MySQL server
 
 三、reactor和proactor对应处理流程  
 reactor:  
-主线程监听读写-读写事件放入监听队列，并注明该事件是读还是写-线程取出读写事件  
+主线程监听读写--读写事件放入监听队列，并注明该事件是读还是写--线程取出读写事件  
 读:  
-读数据到m_read_buf-解析并生成响应报文写入m_write_buf-监听写事件  
+读数据到m_read_buf--解析并生成响应报文写入m_write_buf--监听写事件  
 写:  
 m_write_buf数据写入socket  
   
 proactor:  
 主线程监听读写  
 读:  
-读数据到m_read_buf-放入请求队列-线程取出读事件-解析并生成响应报文写入m_write_buf-监听写事件  
+读数据到m_read_buf--放入请求队列--线程取出读事件--解析并生成响应报文写入m_write_buf--监听写事件  
 写:  
 m_write_buf写入socket  
 
