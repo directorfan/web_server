@@ -1,6 +1,6 @@
-一、运行方法: 
-ubuntu 20.04
-MYSQL server
+一、运行方法:   
+ubuntu 20.04  
+MYSQL server  
 
 1 build.sh生成 server  
 2 ./server运行服务器  
@@ -138,10 +138,10 @@ MYSQL server
     char sql_name[100];//密码名  
     };  
 
-2 threadpool类:
-1)创建指定数量线程
-2)所有线程再工作为队列中无http_conn对象时阻塞
-3)从工作队列中取出http_conn对象处理
+2 threadpool类:  
+1)创建指定数量线程  
+2)所有线程再工作为队列中无http_conn对象时阻塞  
+3)从工作队列中取出http_conn对象处理  
 
     template <typename T>
     class threadpool
@@ -169,10 +169,10 @@ MYSQL server
         int m_actor_model;          //模型切换
     };
 
-3 lst_timer类:
-1)将待监听事件挂到红黑树上
-2)sig_handler()函数，将信号通过管道发送到主线程
-3)主线程每五秒接收到SIG_ALARM信号，回调timer_handler()函数，遍历定时器链表，删除超时节点并将对应socketfd移除监听
+3 lst_timer类:  
+1)将待监听事件挂到红黑树上  
+2)sig_handler()函数，将信号通过管道发送到主线程  
+3)主线程每五秒接收到SIG_ALARM信号，回调timer_handler()函数，遍历定时器链表，删除超时节点并将对应socketfd移除监听  
 
     class util_timer;
 
@@ -249,5 +249,76 @@ MYSQL server
 
     void cb_func(client_data *user_data);//删除定时器节点时要配合使用的函数，关闭文件描述符，取下监听节点
 
-4 webserver类:
-1)初始化
+4 webserver类:  
+1)初始化时创建MAX_FD个http_conn对象  
+2)监听连接和读写事件，定时事件  
+3)处理新连接，添加定时器到定时器容器链表，将socketfd对应http_conn对象重新赋值  
+4)将读写socket对应http_conn对象放入工作队列，调整定时器  
+5)创建定时器容器链表timer_lst和链接资源数组users_timer  
+6)监听到管道有读事件，设置timeout=true后，遍历容器链表  
+
+    const int MAX_FD = 65536;           //最大文件描述符
+    const int MAX_EVENT_NUMBER = 10000; //epoll返回的最大事件数
+    const int TIMESLOT = 5;             //定时检查单位，5s
+
+    class WebServer
+    {
+    public:
+        WebServer();//生成MAX_FD个http_conn对象，MAX_FD个client_data对象，初始化资源目录
+        ~WebServer();
+
+        void init(int port , string user, string passWord, string databaseName,
+                  int log_write , int opt_linger, int trigmode, int sql_num,
+                  int thread_num, int close_log, int actor_model);
+
+        void thread_pool();//创建线程池
+        void sql_pool();//单例模式获取数据库连接池
+        void log_write();//初始化日志对象，其中 m_log_write 1 异步日志，设置阻塞队列 0 同步日志，不设置阻塞队列
+        void trig_mode();//根据m_TRIGMode，设置m_LISTENTrigmode和m_CONNTrigmode
+        void eventListen();//socket(),setsocketopt(),bind(),listen(),初始化定时器对象，创建红黑树监听节点，监听listenfd和管道读端，添加信号处理函数
+        void eventLoop();//epoll_wait(),处理新到的连接（主线程），读写事件，信号（主线程）和异常(主线程)
+        void timer(int connfd, struct sockaddr_in client_address);//处理新到的连接时使用，给http_conn对象赋值，创建定时器节点，设置回调函数和超时时间，绑定用户数据，将定时器添加到链表中
+        void adjust_timer(util_timer *timer);//dealwithread和dealwithwrite中使用，则将定时器往后延迟3个单位,并对新的定时器在链表上的位置进行调整
+        void deal_timer(util_timer *timer, int sockfd);//移除监听节点，关闭对应文件描述符，将定时器节点从链表中删除
+        bool dealclinetdata();//处理新到的连接
+        bool dealwithsignal(bool& timeout, bool& stop_server);//处理信号，遍历定时器链表删除超时节点
+        void dealwithread(int sockfd);//处理读事件，分为reactor和proactor
+        void dealwithwrite(int sockfd);//处理读事件，分为reactor和proactor
+
+    public:
+        //基础
+        int m_port;
+        char *m_root;//资源目录
+        int m_log_write;// 1 异步日志，设置阻塞队列 0 同步日志，不设置阻塞队列
+        int m_close_log;// 0 使用日志 1 不使用日志
+        int m_actormodel;// 1 reactor模式 0 proactor模式
+
+        int m_pipefd[2];//与定时器信号通信的管道
+        int m_epollfd;//监听红黑树树根
+        http_conn *users;//http_conn对象数组
+
+        //数据库相关
+        connection_pool *m_connPool;//数据库连接池
+        string m_user;         //登陆数据库用户名
+        string m_passWord;     //登陆数据库密码
+        string m_databaseName; //使用数据库名
+        int m_sql_num;
+
+        //线程池相关
+        threadpool<http_conn> *m_pool;//线程池
+        int m_thread_num;
+
+        //epoll_event相关
+        epoll_event events[MAX_EVENT_NUMBER];//epoll_wait传出数组
+
+        int m_listenfd;//监听socket
+        int m_OPT_LINGER;
+        int m_TRIGMode;//trig_mode使用
+        int m_LISTENTrigmode;//监听 0 LT 1 ET
+        int m_CONNTrigmode;//读写 0 LT 1 ET
+
+        //定时器相关
+        client_data *users_timer;//客户端资源数组
+        Utils utils;//定时器对象
+    };
+
