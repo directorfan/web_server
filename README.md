@@ -1,7 +1,7 @@
 一、运行方法:   
 ubuntu 20.04  
 MySQL server  
-1
+
     create database yourdb;  
     // 创建user表  
     USE yourdb;  
@@ -9,8 +9,8 @@ MySQL server
         username char(50) NULL,  
         passwd char(50) NULL  
     )ENGINE=InnoDB;  
-2 sh build.sh    
-3 ./server [-p port]   
+    sh build.sh    
+    ./server [-p port]   
 -p，自定义端口号  
 默认9006  
 
