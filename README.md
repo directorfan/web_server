@@ -1,9 +1,10 @@
 一、运行方法:   
 ubuntu 20.04  
-MYSQL server  
+MySQL server  
 
-1 build.sh生成 server  
-2 ./server运行服务器  
+1 创建名为yourdb的数据库  
+2 build.sh生成 server  
+3 ./server运行服务器  
 
 
 二、分模块介绍  
@@ -140,7 +141,7 @@ MYSQL server
 
 2 threadpool类:  
 1)创建指定数量线程  
-2)所有线程再工作为队列中无http_conn对象时阻塞  
+2)所有线程在工作为队列中无http_conn对象时阻塞  
 3)从工作队列中取出http_conn对象处理  
 
     template <typename T>
