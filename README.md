@@ -13,6 +13,7 @@ MySQL server
     ./server [-p port]   
 -p，自定义端口号  
 默认9006  
+    localhost:port
 
 二、分模块介绍  
 1 http_conn类:   
