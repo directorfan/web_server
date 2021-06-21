@@ -133,6 +133,6 @@
     char sql_user[100];//用户名  
     char sql_passwd[100];//数据库名  
     char sql_name[100];//密码名  
-};  
+    };  
 
 
