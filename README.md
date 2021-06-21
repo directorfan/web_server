@@ -11,7 +11,7 @@
 3)process_write()函数生成响应报文存储到m_write_buf  
 4)do_request()函数将请求的文件映射到内存  
 5)write()函数将m_write_buf和文件写入客户端socket  
-  
+   
 class http_conn  
 {  
 public:  
