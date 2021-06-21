@@ -5,8 +5,11 @@
 二、分模块介绍  
 1 http_conn类： 
 主要功能：  
-从客户端读取数据到m_read_buf read_once()  
-解析m_read_buf  
+1)read_once()函数从客户端读取数据到m_read_buf   
+2)prcess_read()函数解析m_read_buf中数据  
+3)process_write()函数生成响应报文存储到m_write_buf  
+4)do_request()函数将请求的文件映射到内存  
+5)write()函数将m_write_buf和文件写入客户端socket  
 class http_conn  
 {  
 public:  
