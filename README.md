@@ -1,11 +1,18 @@
 一、运行方法:   
 ubuntu 20.04  
 MySQL server  
-
-1 创建名为yourdb的数据库  
-2 build.sh生成 server  
-3 ./server运行服务器  
-
+1
+    create database yourdb;  
+    // 创建user表  
+    USE yourdb;  
+    CREATE TABLE user(  
+        username char(50) NULL,  
+        passwd char(50) NULL  
+    )ENGINE=InnoDB;  
+2 sh build.sh    
+3 ./server [-p port]   
+-p，自定义端口号  
+默认9006  
 
 二、分模块介绍  
 1 http_conn类:   
