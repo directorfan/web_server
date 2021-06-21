@@ -2,14 +2,16 @@
 1 build.sh生成 server  
 2 ./server运行服务器  
 
+
 二、分模块介绍  
-1 http_conn类： 
+1 http_conn类:   
 主要功能：  
 1)read_once()函数从客户端读取数据到m_read_buf   
 2)prcess_read()函数解析m_read_buf中数据  
 3)process_write()函数生成响应报文存储到m_write_buf  
 4)do_request()函数将请求的文件映射到内存  
 5)write()函数将m_write_buf和文件写入客户端socket  
+  
 class http_conn  
 {  
 public:  
@@ -123,11 +125,11 @@ private:
     int bytes_to_send;//待发送的字节数，包括m_write_idx和映射文件长度  
     int bytes_have_send;//已发送的字节数  
     char *doc_root;//当前工作目录  
-  
+    
     map<string, string> m_m_TRIGModeusers;//存储用户名和密码的映射  
     int m_TRIGMode;//连接套接字的触发模式 0 LT 1 ET  
     int m_close_log;  
-  
+    
     char sql_user[100];//用户名  
     char sql_passwd[100];//数据库名  
     char sql_name[100];//密码名  
